@@ -143,12 +143,6 @@ class AI {
           includeMetadata: true,
         });
         return results;
-        // const relevantChunks = results.matches.map((match) => ({
-        //   text: match.metadata?.text as string,
-        //   score: match.score,
-        // }));
-        // const context = relevantChunks.map((c) => c.text).join("\n\n");
-        // return context;
       } else {
         return response?.data[0] || "Unexpected error";
       }
