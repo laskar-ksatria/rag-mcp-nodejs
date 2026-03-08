@@ -17,6 +17,14 @@
   ],
   "author": "laskarksatria",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/laskar-ksatria/rag-mcp-nodejs"
+  },
+  "homepage": "https://github.com/laskar-ksatria/rag-mcp-nodejs#readme",
+  "bugs": {
+    "url": "https://github.com/laskar-ksatria/rag-mcp-nodejs/issues"
+  },
   "publishConfig": {
     "access": "public"
   },
