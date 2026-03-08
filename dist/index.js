@@ -1,11 +1,34 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
+import { config } from "zod";
+import AI from "./ai.js";
+import { env } from "./env.js";
+const PROVIDER_OPTIONS = ["openai", "openrouter"];
+function parseProvider(value) {
+    const v = (value ?? "").toLowerCase();
+    if (v === "openai" || v === "openrouter")
+        return v;
+    throw new Error(`Invalid PROVIDER: "${value}". Must be one of: ${PROVIDER_OPTIONS.join(", ")}`);
+}
 async function main() {
+    config();
+    const provider = parseProvider(env.PROVIDER);
+    const CallAI = new AI({
+        apikey: env.APIKEY,
+        embeddingModel: env.EMBEDDING_MODEL,
+        pineconeIndex: env.PINECONE_INDEX,
+        pineconeKey: env.PINECONE_API_KEY,
+        provider,
+    });
     const server = new McpServer({
         name: "rag-mcp-nodejs",
         version: "1.0.0",
     });
+    // ================================================================================================================= //
+    // TOOLS
+    // ================================================================================================================= //
+    // 1. CONNECTION_TEST ---------------------------------------------------- >
     server.registerTool("echo", {
         title: "Echo Text",
         inputSchema: { text: z.string().describe("Text yang akan di-echo.") },
@@ -18,6 +41,41 @@ async function main() {
             },
         ],
     }));
+    // 2. SAVE_DOCUMENT ---------------------------------------------------- >
+    server.registerTool("save_to_rag", {
+        title: "Save To RAG",
+        description: "Save document or information to RAG",
+        inputSchema: {
+            text: z
+                .string()
+                .describe("Document or information that would be save to RAG"),
+        },
+    }, async ({ text }) => {
+        const response = await CallAI.save_to_rag(text);
+        return {
+            content: [
+                {
+                    type: "text",
+                    text: response,
+                },
+            ],
+        };
+    });
+    // 2. SEARCH_DOCUMENT ------------------------------------------------ >
+    server.registerTool("search_document_on_rag", {
+        title: "Search Document",
+        description: "Search Document on RAG with keyword",
+        inputSchema: {
+            keyword: z
+                .string()
+                .describe("Query / keyword that will search on RAG with similarity"),
+        },
+    }, async ({ keyword }) => {
+        const response = await CallAI.search_documents(keyword);
+        return {
+            content: [{ type: "text", text: `${response}` }],
+        };
+    });
     const transport = new StdioServerTransport();
     await server.connect(transport);
 }

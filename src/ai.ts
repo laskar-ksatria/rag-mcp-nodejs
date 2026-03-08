@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { encodingForModel } from "js-tiktoken";
+import { encodingForModel, TiktokenModel } from "js-tiktoken";
 import {
   Pinecone,
   PineconeRecord,
@@ -7,11 +7,13 @@ import {
 } from "@pinecone-database/pinecone";
 import { env } from "./env.js";
 
+export type TProvider = "openrouter" | "openai" | null;
 export interface IContructorsPayload {
   apikey: string;
-  model: string;
   embeddingModel: string;
-  provider: "openrouter" | "openai";
+  provider: TProvider;
+  pineconeKey: string;
+  pineconeIndex: string;
 }
 
 /**
@@ -24,24 +26,24 @@ export interface IContructorsPayload {
  */
 class AI {
   // States
-  private apiKey: string = "";
   private pineconeKey: string = "";
   private embeddingModel: string = "";
-  private model: string = "";
+  private pineconeIndex: string = "";
   private MCP_AI: OpenAI;
-  private history: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
+  private provider: "openrouter" | "openai" | null = null;
 
   // Contructors
   constructor(args: IContructorsPayload) {
-    this.apiKey = args.apikey;
-    this.model = args.model;
     this.embeddingModel = args.embeddingModel;
+    this.provider = args.provider;
+    this.pineconeKey = args.pineconeKey;
+    this.pineconeIndex = args.pineconeIndex;
     if (args.provider === "openrouter") {
       this.MCP_AI = new OpenAI({
         apiKey: args.apikey,
         baseURL: `https://openrouter.ai/api/v1`,
         defaultHeaders: {
-          "HTTP-Referer": "http://localhost:3005",
+          "HTTP-Referer": "http://localhost:3000",
           "X-Title": "OpenRouter RAG",
           "Cache-Control": "no-cache, no-store, must-revalidate",
           Pragma: "no-cache",
@@ -60,52 +62,31 @@ class AI {
     }
   }
 
-  // AI Config
-  private aiConfig(
-    content: OpenAI.Chat.ChatCompletionMessageParam[],
-  ): OpenAI.Chat.ChatCompletionCreateParamsNonStreaming {
-    // const rulesMd = readFileSync("./RULES.md", "utf-8");
-    return {
-      model: this.model,
-      tool_choice: "auto",
-      max_tokens: 2000,
-      temperature: 0.5,
-      top_p: 1,
-      frequency_penalty: 0,
-      presence_penalty: 0,
-      stop: null,
-      stream: false,
-      messages: [
-        // ...basicPrompt,
-        // { role: "system", content: rulesMd },
-        ...content,
-      ],
-      // tools: [...BASIC_TOOLS],
-    };
-  }
-
   // ================================================================================================== //
   // CHUNK TEXT
   // ================================================================================================== //
-  chunkByToken(text: string, maxTokens = 512, overlap = 50): string[] {
-    const enc = encodingForModel("text-embedding-3-small");
+  chunkByToken(text: string, maxTokens?: number, overlap?: number): string[] {
+    const defaultMax = env.RAG_CHUNK_MAX_TOKENS
+      ? Number(env.RAG_CHUNK_MAX_TOKENS)
+      : 512;
+    const defaultOverlap = 50;
+    const limit = maxTokens ?? defaultMax;
+    const overlapTokens = overlap ?? defaultOverlap;
+
+    let model: TProvider | string = null;
+    if (this.provider === "openrouter") {
+      model = this.embeddingModel.split("/")[1];
+    } else model = this.provider;
+    const enc = encodingForModel(model as TiktokenModel);
     const tokens = Array.from(enc.encode(text));
     const chunks: string[] = [];
     let start = 0;
     while (start < tokens.length) {
-      const slice = tokens.slice(start, start + maxTokens);
+      const slice = tokens.slice(start, start + limit);
       chunks.push(enc.decode(slice));
-      start += maxTokens - overlap;
+      start += limit - overlapTokens;
     }
     return chunks;
-  }
-
-  // ================================================================================================== //
-  // GET_RESPONSE
-  // ================================================================================================== //
-  async get_response(content: string) {
-    try {
-    } catch (error) {}
   }
 
   // ================================================================================================== //
@@ -119,15 +100,13 @@ class AI {
         input: chunkText,
       });
       if (response?.data[0]?.object === "embedding") {
-        // this.saveToJSON(response?.data);
-        // SAVE TO RAG
         const pinecone = new Pinecone({
           apiKey: env.PINECONE_API_KEY as string,
         });
-        const index = pinecone.index("node-rag");
+        const index = pinecone.index(this.pineconeIndex);
         const vectors: PineconeRecord<RecordMetadata>[] = [
           {
-            id: `chunk-${Date.now()}-rag`,
+            id: `${Date.now()}`,
             values: response.data[0]?.embedding,
             metadata: {
               text: chunkText[0],
@@ -136,12 +115,46 @@ class AI {
           },
         ];
         await index.upsert({ records: vectors });
-        return response?.data;
+        return "Document successfully saved!";
+      } else return `${response?.data[0] || "Unexpected error"} `;
+    } catch (error: any) {
+      return `${error}`;
+      // return error?.error?.message || "Unexpected error!";
+    }
+  }
+  // ================================================================================================== //
+  // SEARCH_DOCUMENT
+  // ================================================================================================== //
+  async search_documents(content: string) {
+    try {
+      const chunkText = this.chunkByToken(content);
+      const response = await this.MCP_AI.embeddings.create({
+        model: this.embeddingModel,
+        input: chunkText,
+      });
+      if (response?.data[0]?.object === "embedding") {
+        const questionVector = response.data[0].embedding;
+        // search
+        const pinecone = new Pinecone({ apiKey: this.pineconeKey });
+        const index = pinecone.index(this.pineconeIndex);
+        const results = await index.query({
+          vector: questionVector,
+          topK: 3,
+          includeMetadata: true,
+        });
+        return results;
+        // const relevantChunks = results.matches.map((match) => ({
+        //   text: match.metadata?.text as string,
+        //   score: match.score,
+        // }));
+        // const context = relevantChunks.map((c) => c.text).join("\n\n");
+        // return context;
       } else {
-        console.log(response);
-        return response?.data;
+        return response?.data[0] || "Unexpected error";
       }
-    } catch (error) {}
+    } catch (error) {
+      return `${error}` || "Unexpected error";
+    }
   }
 }
 
