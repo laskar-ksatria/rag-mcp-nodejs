@@ -6,6 +6,7 @@ yarn-error.log*
 
 client.js
 src/client.ts
+backup.txt
 
 claude-desktop-config.json 
 back.json
