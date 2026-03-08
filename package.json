@@ -1,10 +1,10 @@
 {
   "name": "@laskarks/mcp-rag-node",
-  "version": "1.0.1",
+  "version": "1.0.6",
   "description": "Simple MCP RAG server using @modelcontextprotocol/sdk",
   "main": "dist/index.js",
   "bin": {
-    "mcp-rag-node": "dist/index.js"
+    "mcp-rag-node": "bin.mjs"
   },
   "type": "module",
   "scripts": {

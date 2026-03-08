@@ -142,7 +142,14 @@ class AI {
           topK: 3,
           includeMetadata: true,
         });
-        return results;
+
+        // Get text from metadata
+        const relevantChunks = results.matches.map((match) => ({
+          text: match.metadata?.text as string,
+          score: match.score,
+        }));
+        const context = relevantChunks.map((c) => c.text).join("\n\n");
+        return context;
       } else {
         return response?.data[0] || "Unexpected error";
       }

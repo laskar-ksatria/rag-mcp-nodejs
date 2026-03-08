@@ -101,26 +101,6 @@ Install the package first: `npm i @laskarks/mcp-rag-node`
 }
 ```
 
-Or with a local install (e.g. in your project):
-
-```json
-{
-  "mcpServers": {
-    "rag": {
-      "command": "node",
-      "args": ["./node_modules/@laskarks/mcp-rag-node/dist/index.js"],
-      "env": {
-        "APIKEY": "sk-...",
-        "EMBEDDING_MODEL": "text-embedding-3-small",
-        "PINECONE_API_KEY": "...",
-        "PINECONE_INDEX": "rag-index",
-        "PROVIDER": "openai"
-      }
-    }
-  }
-}
-```
-
 **Cursor** (`.cursor/mcp.json` or MCP settings):
 
 ```json
