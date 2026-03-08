@@ -4,8 +4,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-ai.js 
 client.js
+src/client.ts
 
 claude-desktop-config.json 
 back.json
