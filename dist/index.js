@@ -28,22 +28,9 @@ async function main() {
     // ================================================================================================================= //
     // TOOLS
     // ================================================================================================================= //
-    // 1. CONNECTION_TEST ---------------------------------------------------- >
-    server.registerTool("echo", {
-        title: "Echo Text",
-        inputSchema: { text: z.string().describe("Text yang akan di-echo.") },
-        description: "Mengembalikan kembali text yang dikirim.",
-    }, async ({ text }) => ({
-        content: [
-            {
-                type: "text",
-                text,
-            },
-        ],
-    }));
-    // 2. SAVE_DOCUMENT ---------------------------------------------------- >
-    server.registerTool("save_to_rag", {
-        title: "Save To RAG",
+    // 1. SAVE_DOCUMENT ---------------------------------------------------- >
+    server.registerTool("save_document_to_rag", {
+        title: "Save Document To RAG",
         description: "Save document or information to RAG",
         inputSchema: {
             text: z
@@ -63,7 +50,7 @@ async function main() {
     });
     // 2. SEARCH_DOCUMENT ------------------------------------------------ >
     server.registerTool("search_document_on_rag", {
-        title: "Search Document",
+        title: "Search Document On RAG",
         description: "Search Document on RAG with keyword",
         inputSchema: {
             keyword: z
