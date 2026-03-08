@@ -68,7 +68,7 @@ class AI {
   chunkByToken(text: string, maxTokens?: number, overlap?: number): string[] {
     const defaultMax = env.RAG_CHUNK_MAX_TOKENS
       ? Number(env.RAG_CHUNK_MAX_TOKENS)
-      : 512;
+      : 1536;
     const defaultOverlap = 50;
     const limit = maxTokens ?? defaultMax;
     const overlapTokens = overlap ?? defaultOverlap;
@@ -151,10 +151,10 @@ class AI {
         const context = relevantChunks.map((c) => c.text).join("\n\n");
         return context;
       } else {
-        return response?.data[0] || "Unexpected error";
+        return "Unexpected error";
       }
     } catch (error) {
-      return `${error}` || "Unexpected error";
+      return "Unexpected error";
     }
   }
 }

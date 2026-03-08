@@ -2,6 +2,50 @@
 
 MCP (Model Context Protocol) server for RAG (Retrieval-Augmented Generation) using Pinecone, OpenAI-compatible embedding APIs, and the official MCP SDK. Save documents and search by semantic similarity via MCP tools.
 
+### Add to MCP clients
+
+**Claude Desktop** (`claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "rag": {
+      "command": "npx",
+      "args": ["-y", "@laskarks/mcp-rag-node"],
+      "env": {
+        "APIKEY": "sk-...",
+        "EMBEDDING_MODEL": "text-embedding-3-small",
+        "RAG_CHUNK_MAX_TOKENS": 1536,
+        "PINECONE_API_KEY": "...",
+        "PINECONE_INDEX": "rag-index",
+        "PROVIDER": "openai | openrouter"
+      }
+    }
+  }
+}
+```
+
+**Cursor** (`.cursor/mcp.json` or MCP settings):
+
+```json
+{
+  "mcpServers": {
+    "rag": {
+      "command": "npx",
+      "args": ["-y", "@laskarks/mcp-rag-node"],
+      "env": {
+        "APIKEY": "sk-...",
+        "EMBEDDING_MODEL": "text-embedding-3-small",
+        "RAG_CHUNK_MAX_TOKENS": 1536,
+        "PINECONE_API_KEY": "...",
+        "PINECONE_INDEX": "rag-index",
+        "PROVIDER": "openai | openrouter"
+      }
+    }
+  }
+}
+```
+
 ## Tools
 
 | Tool                     | Description                                            |
@@ -50,7 +94,7 @@ For OpenRouter, use the model ID format, e.g. `openai/text-embedding-3-small` or
 
 | Variable               | Description                           | Default |
 | ---------------------- | ------------------------------------- | ------- |
-| `RAG_CHUNK_MAX_TOKENS` | Max tokens per chunk before embedding | `512`   |
+| `RAG_CHUNK_MAX_TOKENS` | Max tokens per chunk before embedding | `1536`  |
 | `RAG_CHUNK_OVERLAP`    | Overlap tokens between chunks         | `50`    |
 
 ## Usage
@@ -75,50 +119,6 @@ PROVIDER=openai
 
 ```bash
 npm start
-```
-
-### Add to MCP clients
-
-Install the package first: `npm i @laskarks/mcp-rag-node`
-
-**Claude Desktop** (`claude_desktop_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "rag": {
-      "command": "npx",
-      "args": ["-y", "@laskarks/mcp-rag-node"],
-      "env": {
-        "APIKEY": "sk-...",
-        "EMBEDDING_MODEL": "text-embedding-3-small",
-        "PINECONE_API_KEY": "...",
-        "PINECONE_INDEX": "rag-index",
-        "PROVIDER": "openai"
-      }
-    }
-  }
-}
-```
-
-**Cursor** (`.cursor/mcp.json` or MCP settings):
-
-```json
-{
-  "mcpServers": {
-    "rag": {
-      "command": "npx",
-      "args": ["-y", "@laskarks/mcp-rag-node"],
-      "env": {
-        "APIKEY": "sk-...",
-        "EMBEDDING_MODEL": "text-embedding-3-small",
-        "PINECONE_API_KEY": "...",
-        "PINECONE_INDEX": "rag-index",
-        "PROVIDER": "openai"
-      }
-    }
-  }
-}
 ```
 
 ### Development

@@ -60,7 +60,7 @@ async function main() {
     }, async ({ keyword }) => {
         const response = await CallAI.search_documents(keyword);
         return {
-            content: [{ type: "text", text: `${response}` }],
+            content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
         };
     });
     const transport = new StdioServerTransport();

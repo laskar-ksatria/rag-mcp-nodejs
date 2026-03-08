@@ -52,7 +52,7 @@ class AI {
     chunkByToken(text, maxTokens, overlap) {
         const defaultMax = env.RAG_CHUNK_MAX_TOKENS
             ? Number(env.RAG_CHUNK_MAX_TOKENS)
-            : 512;
+            : 1536;
         const defaultOverlap = 50;
         const limit = maxTokens ?? defaultMax;
         const overlapTokens = overlap ?? defaultOverlap;
@@ -129,13 +129,13 @@ class AI {
                     topK: 3,
                     includeMetadata: true,
                 });
-                return results;
-                // const relevantChunks = results.matches.map((match) => ({
-                //   text: match.metadata?.text as string,
-                //   score: match.score,
-                // }));
-                // const context = relevantChunks.map((c) => c.text).join("\n\n");
-                // return context;
+                // Get text from metadata
+                const relevantChunks = results.matches.map((match) => ({
+                    text: match.metadata?.text,
+                    score: match.score,
+                }));
+                const context = relevantChunks.map((c) => c.text).join("\n\n");
+                return context;
             }
             else {
                 return response?.data[0] || "Unexpected error";

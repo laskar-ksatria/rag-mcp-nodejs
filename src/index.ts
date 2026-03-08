@@ -78,7 +78,7 @@ async function main() {
     async ({ keyword }: { keyword: string }) => {
       const response = await CallAI.search_documents(keyword);
       return {
-        content: [{ type: "text", text: JSON.stringify(response, null, 2) }],
+        content: [{ type: "text", text: response as string }],
       };
     },
   );
