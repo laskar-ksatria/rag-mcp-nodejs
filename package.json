@@ -3,6 +3,9 @@
   "version": "1.0.1",
   "description": "Simple MCP RAG server using @modelcontextprotocol/sdk",
   "main": "dist/index.js",
+  "bin": {
+    "mcp-rag-node": "dist/index.js"
+  },
   "type": "module",
   "scripts": {
     "build": "tsc",

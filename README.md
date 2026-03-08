@@ -12,9 +12,7 @@ MCP (Model Context Protocol) server for RAG (Retrieval-Augmented Generation) usi
 ## Installation
 
 ```bash
-npm install rag-mcp-nodejs
-# or
-npx rag-mcp-nodejs
+npm i @laskarks/mcp-rag-node
 ```
 
 ## Environment Variables
@@ -81,14 +79,36 @@ npm start
 
 ### Add to MCP clients
 
+Install the package first: `npm i @laskarks/mcp-rag-node`
+
 **Claude Desktop** (`claude_desktop_config.json`):
 
 ```json
 {
   "mcpServers": {
     "rag": {
+      "command": "npx",
+      "args": ["-y", "@laskarks/mcp-rag-node"],
+      "env": {
+        "APIKEY": "sk-...",
+        "EMBEDDING_MODEL": "text-embedding-3-small",
+        "PINECONE_API_KEY": "...",
+        "PINECONE_INDEX": "rag-index",
+        "PROVIDER": "openai"
+      }
+    }
+  }
+}
+```
+
+Or with a local install (e.g. in your project):
+
+```json
+{
+  "mcpServers": {
+    "rag": {
       "command": "node",
-      "args": ["/path/to/rag-mcp-nodejs/dist/index.js"],
+      "args": ["./node_modules/@laskarks/mcp-rag-node/dist/index.js"],
       "env": {
         "APIKEY": "sk-...",
         "EMBEDDING_MODEL": "text-embedding-3-small",
@@ -107,8 +127,8 @@ npm start
 {
   "mcpServers": {
     "rag": {
-      "command": "node",
-      "args": ["/path/to/rag-mcp-nodejs/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "@laskarks/mcp-rag-node"],
       "env": {
         "APIKEY": "sk-...",
         "EMBEDDING_MODEL": "text-embedding-3-small",
