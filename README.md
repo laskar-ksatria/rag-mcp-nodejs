@@ -4,10 +4,9 @@ MCP (Model Context Protocol) server for RAG (Retrieval-Augmented Generation) usi
 
 ## Tools
 
-| Tool | Description |
-|------|-------------|
-| `echo` | Echo back text (connection test). No external API required. |
-| `save_to_rag` | Chunk text, create embeddings, and save to Pinecone. |
+| Tool                     | Description                                            |
+| ------------------------ | ------------------------------------------------------ |
+| `save_to_rag`            | Chunk text, create embeddings, and save to Pinecone.   |
 | `search_document_on_rag` | Search documents by keyword using semantic similarity. |
 
 ## Installation
@@ -22,13 +21,13 @@ npx rag-mcp-nodejs
 
 ### Required
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `APIKEY` | OpenAI or OpenRouter API key for embeddings | `sk-...` |
-| `EMBEDDING_MODEL` | Embedding model ID | `text-embedding-3-small`, `openai/text-embedding-3-small` |
-| `PINECONE_API_KEY` | Pinecone API key | `...` |
-| `PINECONE_INDEX` | Pinecone index name (dimension must match embedding model) | `rag-index` |
-| `PROVIDER` | AI provider (allowed values: `openai`, `openrouter`) | `openai` or `openrouter` |
+| Variable           | Description                                                | Example                                                   |
+| ------------------ | ---------------------------------------------------------- | --------------------------------------------------------- |
+| `APIKEY`           | OpenAI or OpenRouter API key for embeddings                | `sk-...`                                                  |
+| `EMBEDDING_MODEL`  | Embedding model ID                                         | `text-embedding-3-small`, `openai/text-embedding-3-small` |
+| `PINECONE_API_KEY` | Pinecone API key                                           | `...`                                                     |
+| `PINECONE_INDEX`   | Pinecone index name (dimension must match embedding model) | `rag-index`                                               |
+| `PROVIDER`         | AI provider (allowed values: `openai`, `openrouter`)       | `openai` or `openrouter`                                  |
 
 > **Important:** Create your Pinecone index with the same dimension as your embedding model.
 
@@ -36,25 +35,25 @@ npx rag-mcp-nodejs
 
 Use the **Dimension** column when creating your Pinecone index.
 
-| Model | Dimension | Provider |
-|-------|-----------|----------|
-| `text-embedding-3-small` | 1536 | OpenAI, OpenRouter |
-| `text-embedding-3-large` | 3072 | OpenAI, OpenRouter |
-| `text-embedding-ada-002` | 1536 | OpenAI, OpenRouter |
-| `text-embedding-3-small` (with dimensions param) | 512–1536 | OpenAI |
-| `voyage-3` | 1024 | Voyage (via OpenRouter) |
-| `nomic-embed-text-v1.5` | 768 | Nomic (via OpenRouter) |
-| `mistral-embed` | 1024 | Mistral (via OpenRouter) |
-| `cohere/embed-english-v3.0` | 1024 | Cohere (via OpenRouter) |
+| Model                                            | Dimension | Provider                 |
+| ------------------------------------------------ | --------- | ------------------------ |
+| `text-embedding-3-small`                         | 1536      | OpenAI, OpenRouter       |
+| `text-embedding-3-large`                         | 3072      | OpenAI, OpenRouter       |
+| `text-embedding-ada-002`                         | 1536      | OpenAI, OpenRouter       |
+| `text-embedding-3-small` (with dimensions param) | 512–1536  | OpenAI                   |
+| `voyage-3`                                       | 1024      | Voyage (via OpenRouter)  |
+| `nomic-embed-text-v1.5`                          | 768       | Nomic (via OpenRouter)   |
+| `mistral-embed`                                  | 1024      | Mistral (via OpenRouter) |
+| `cohere/embed-english-v3.0`                      | 1024      | Cohere (via OpenRouter)  |
 
 For OpenRouter, use the model ID format, e.g. `openai/text-embedding-3-small` or `voyage/voyage-3`.
 
 ### Optional
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `RAG_CHUNK_MAX_TOKENS` | Max tokens per chunk before embedding | `512` |
-| `RAG_CHUNK_OVERLAP` | Overlap tokens between chunks | `50` |
+| Variable               | Description                           | Default |
+| ---------------------- | ------------------------------------- | ------- |
+| `RAG_CHUNK_MAX_TOKENS` | Max tokens per chunk before embedding | `512`   |
+| `RAG_CHUNK_OVERLAP`    | Overlap tokens between chunks         | `50`    |
 
 ## Usage
 
@@ -157,17 +156,19 @@ dist/           # Compiled output (after npm run build)
 Before publishing:
 
 1. Add `files` to `package.json` to include only `dist/` and docs:
-   ```json
-   "files": ["dist", "README.md"]
-   ```
+
+```json
+ "files": ["dist", "README.md"]
+```
+
 2. Ensure `npm run build` succeeds and `dist/` is committed or built on publish.
 3. Add `bin` entry for `npx rag-mcp-nodejs` (optional):
-   ```json
-   "bin": { "rag-mcp-nodejs": "dist/index.js" }
-   ```
-   Note: MCP servers are usually run via `node dist/index.js`; a `bin` is optional.
-4. Set a unique package name (npm may require scoped name, e.g. `@yourname/rag-mcp-nodejs`).
-5. Add `repository`, `homepage`, and `engines.node` in `package.json` (optional but recommended).
+
+```json
+ "bin": { "rag-mcp-nodejs": "dist/index.js" }
+```
+
+Note: MCP servers are usually run via `node dist/index.js`; a `bin` is optional. 4. Set a unique package name (npm may require scoped name, e.g. `@yourname/rag-mcp-nodejs`). 5. Add `repository`, `homepage`, and `engines.node` in `package.json` (optional but recommended).
 
 ## Requirements
 
